@@ -59,29 +59,34 @@ defmodule FontAwesomePhoenix.HTML do
         [?<, "i", " class=\\"fa fa-at x\\" data-mood=\\"happy\\"", ?>,
           [?<, "em", "", ?>, "@", ?<, ?/, "em", ?>], ?<, ?/, "i", ?>]}
   """
-  @spec fa_icon(String.t | [String.t], Keyword.t | none) :: {:safe, [String.t]}
-  def fa_icon(names, opts, [do: block]) when is_binary(names) or is_list(names) do
+  @spec fa_icon(String.t() | [String.t()], Keyword.t() | none) :: {:safe, [String.t()]}
+  def fa_icon(names, opts, do: block) when is_binary(names) or is_list(names) do
     data = Keyword.get(opts, :data, [])
     content_tag(:i, block, class: tag_class_string(names, opts), data: data)
   end
-  def fa_icon(names, [do: block]) when is_binary(names) or is_list(names) do
+
+  def fa_icon(names, do: block) when is_binary(names) or is_list(names) do
     content_tag(:i, block, class: tag_class_string(names))
   end
+
   def fa_icon(names, opts) when is_binary(names) or is_list(names) do
     data = Keyword.get(opts, :data, [])
+
     content_tag(:i, "", class: tag_class_string(names, opts), data: data)
     |> add_text(text(opts), align_tag(opts))
   end
+
   def fa_icon(names) when is_binary(names) or is_list(names) do
     content_tag(:i, "", class: tag_class_string(names))
   end
 
   defp add_text({:safe, tag_strings}, text, align) do
     text
-    |> String.strip
+    |> String.trim()
     |> html_escape
     |> _add_text(tag_strings, align)
   end
+
   defp _add_text({:safe, ""}, safe_tag, _), do: {:safe, safe_tag}
   defp _add_text({:safe, text}, safe_tag, :left), do: {:safe, safe_tag ++ [" " <> text]}
   defp _add_text({:safe, text}, safe_tag, :right), do: {:safe, [text <> " "] ++ safe_tag}
@@ -99,6 +104,7 @@ defmodule FontAwesomePhoenix.HTML do
     |> String.split(" ")
     |> fa_classes
   end
+
   defp fa_classes(names) when is_list(names) do
     names
     |> Enum.filter(&(String.length(&1) > 0))
@@ -107,7 +113,7 @@ defmodule FontAwesomePhoenix.HTML do
 
   defp tag_class_string(names, opts \\ []) do
     (~w(fa) ++ fa_classes(names) ++ extra_classes(opts))
-    |> Enum.map(&String.strip/1)
+    |> Enum.map(&String.trim/1)
     |> Enum.join(" ")
   end
 
